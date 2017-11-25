@@ -5,7 +5,17 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"fmt"
 )
+
+func preExec() {
+	for _, s := range settings["pre_exec"].([]interface{}) {
+		buildLog(fmt.Sprintf("Exec: %s", s))
+
+		cmd := exec.Command("cmd", "/C", s.(string))
+		cmd.Run()
+	}
+}
 
 func build() (string, bool) {
 	buildLog("Building...")

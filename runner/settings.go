@@ -18,9 +18,9 @@ var settings = map[string]interface{}{
 	"tmp_path":          "./tmp",
 	"build_name":        "runner-build",
 	"build_log":         "runner-build-errors.log",
-	"valid_ext":         []string{"go"},
-	"no_rebuild_ext":    []string{"html", "css", "js", "json", "conf", "gitignore", "bat"},
-	"ignored":           []string{"views", "public", "static", "assets", "tmp"},
+	"valid_ext":         []interface{}{"go", "html", "css", "js"},
+	"no_rebuild_ext":    []interface{}{"json", "conf", "gitignore", "bat"},
+	"ignored":           []interface{}{"tmp"},
 	"build_delay":       600,
 	"colors":            true,
 	"log_color_main":    "cyan",
@@ -28,6 +28,7 @@ var settings = map[string]interface{}{
 	"log_color_runner":  "green",
 	"log_color_watcher": "magenta",
 	"log_color_app":     "",
+	"pre_exec":          []interface{}{},
 }
 
 var colors = map[string]string{

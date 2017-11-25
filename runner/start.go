@@ -5,16 +5,17 @@ import (
 	"runtime"
 	"strings"
 	"time"
+	"os/exec"
 )
 
 var (
 	startChannel chan string
-	stopChannel  chan bool
-	mainLog      logFunc
-	watcherLog   logFunc
-	runnerLog    logFunc
-	buildLog     logFunc
-	appLog       logFunc
+	//stopChannel  chan bool
+	mainLog    logFunc
+	watcherLog logFunc
+	runnerLog  logFunc
+	buildLog   logFunc
+	appLog     logFunc
 )
 
 func flushEvents() {
@@ -34,6 +35,7 @@ func start() {
 
 	started := false
 
+	var cmd *exec.Cmd
 	go func() {
 		for {
 			loopIndex++
@@ -47,6 +49,10 @@ func start() {
 
 			flushEvents()
 
+			preExec()
+
+			flushEvents()
+
 			mainLog("Started! (%d Goroutines)", runtime.NumGoroutine())
 			err := removeBuildErrorsLog()
 			if err != nil {
@@ -55,6 +61,10 @@ func start() {
 
 			buildFailed := false
 			if shouldRebuild(eventName) {
+				if cmd != nil {
+					mainLog("Kill process: %d", cmd.Process.Pid)
+					cmd.Process.Kill()
+				}
 
 				errorMessage, ok := build()
 				if !ok {
@@ -68,10 +78,10 @@ func start() {
 			}
 
 			if !buildFailed {
-				if started {
-					stopChannel <- true
-				}
-				run()
+				//if started {
+				//	stopChannel <- true
+				//}
+				_, cmd = run()
 			}
 
 			started = true
@@ -82,7 +92,7 @@ func start() {
 
 func init() {
 	startChannel = make(chan string, 1000)
-	stopChannel = make(chan bool)
+	//stopChannel = make(chan bool)
 }
 
 func initLogFuncs() {

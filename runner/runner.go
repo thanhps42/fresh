@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func run() bool {
+func run() (bool, *exec.Cmd) {
 	runnerLog("Running...")
 
 	cmd := exec.Command(buildPath())
@@ -28,12 +28,12 @@ func run() bool {
 	go io.Copy(appLogWriter{}, stderr)
 	go io.Copy(appLogWriter{}, stdout)
 
-	go func() {
-		<-stopChannel
-		pid := cmd.Process.Pid
-		runnerLog("Killing PID %d", pid)
-		cmd.Process.Kill()
-	}()
+	//go func() {
+	//	<-stopChannel
+	//	pid := cmd.Process.Pid
+	//	runnerLog("Killing PID %d", pid)
+	//	cmd.Process.Kill()
+	//}()
 
-	return true
+	return true, cmd
 }

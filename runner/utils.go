@@ -30,8 +30,8 @@ func isIgnoredFolder(path string) bool {
 		return false
 	}
 
-	for _, value := range settings["ignored"].([]string) {
-		if value == paths[0] {
+	for _, value := range settings["ignored"].([]interface{}) {
+		if value.(string) == paths[0] {
 			return true
 		}
 	}
@@ -48,7 +48,7 @@ func isWatchedFile(path string) bool {
 
 	ext := filepath.Ext(path)
 
-	for _, e := range settings["valid_ext"].([]string) {
+	for _, e := range settings["valid_ext"].([]interface{}) {
 		if fmt.Sprintf(".%s", e) == ext {
 			return true
 		}
@@ -58,11 +58,10 @@ func isWatchedFile(path string) bool {
 }
 
 func shouldRebuild(eventName string) bool {
-	for _, e := range settings["no_rebuild_ext"].([]string) {
-		e = strings.TrimSpace(e)
-		e = "." + e
+	for _, e := range settings["no_rebuild_ext"].([]interface{}) {
+		ext := "." + e.(string)
 		fileName := strings.Replace(strings.Split(eventName, ":")[0], `"`, "", -1)
-		if strings.HasSuffix(fileName, e) {
+		if strings.HasSuffix(fileName, ext) {
 			return false
 		}
 	}
