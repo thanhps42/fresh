@@ -49,7 +49,7 @@ func isWatchedFile(path string) bool {
 	ext := filepath.Ext(path)
 
 	for _, e := range settings.ValidExt {
-		if e == "*" || fmt.Sprintf(".%s", e) == ext {
+		if fmt.Sprintf(".%s", e) == ext {
 			return true
 		}
 	}

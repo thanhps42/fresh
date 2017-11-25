@@ -29,7 +29,7 @@ var settings = struct {
 	BuildLog:     "runner-build-errors.log",
 	ValidExt:     []string{"go", "html", "css", "js"},
 	NoRebuildExt: []string{"json", "conf", "gitignore", "bat"},
-	Ignored:      []string{"tmp"},
+	Ignored:      []string{"tmp", ".idea", ".vscode"},
 	BuildDelay:   600,
 	PreExec:      []string{},
 }
