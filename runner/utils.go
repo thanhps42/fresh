@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"fmt"
 )
 
 func initFolders() {
@@ -29,8 +30,8 @@ func isIgnoredFolder(path string) bool {
 		return false
 	}
 
-	for _, e := range strings.Split(settings["ignored"], ",") {
-		if strings.TrimSpace(e) == paths[0] {
+	for _, value := range settings["ignored"].([]string) {
+		if value == paths[0] {
 			return true
 		}
 	}
@@ -47,8 +48,8 @@ func isWatchedFile(path string) bool {
 
 	ext := filepath.Ext(path)
 
-	for _, e := range strings.Split(settings["valid_ext"], ",") {
-		if strings.TrimSpace(e) == ext {
+	for _, e := range settings["valid_ext"].([]string) {
+		if fmt.Sprintf(".%s", e) == ext {
 			return true
 		}
 	}
@@ -57,8 +58,9 @@ func isWatchedFile(path string) bool {
 }
 
 func shouldRebuild(eventName string) bool {
-	for _, e := range strings.Split(settings["no_rebuild_ext"], ",") {
+	for _, e := range settings["no_rebuild_ext"].([]string) {
 		e = strings.TrimSpace(e)
+		e = "." + e
 		fileName := strings.Replace(strings.Split(eventName, ":")[0], `"`, "", -1)
 		if strings.HasSuffix(fileName, e) {
 			return false

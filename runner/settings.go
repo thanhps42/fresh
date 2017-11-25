@@ -5,29 +5,24 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
 	"time"
 
-	"github.com/pilu/config"
+	"io/ioutil"
+	"encoding/json"
+	"reflect"
 )
 
-const (
-	envSettingsPrefix   = "RUNNER_"
-	mainSettingsSection = "Settings"
-)
-
-var settings = map[string]string{
-	"config_path":       "./runner.conf",
+var settings = map[string]interface{}{
+	"config_path":       "./fresh.json",
 	"root":              ".",
 	"tmp_path":          "./tmp",
 	"build_name":        "runner-build",
 	"build_log":         "runner-build-errors.log",
-	"valid_ext":         ".go, .tpl, .tmpl, .html",
-	"no_rebuild_ext":    ".tpl, .tmpl, .html",
-	"ignored":           "assets, tmp",
-	"build_delay":       "600",
-	"colors":            "1",
+	"valid_ext":         []string{"go"},
+	"no_rebuild_ext":    []string{"html", "css", "js", "json", "conf", "gitignore", "bat"},
+	"ignored":           []string{"views", "public", "static", "assets", "tmp"},
+	"build_delay":       600,
+	"colors":            true,
 	"log_color_main":    "cyan",
 	"log_color_build":   "yellow",
 	"log_color_runner":  "green",
@@ -65,18 +60,9 @@ var colors = map[string]string{
 
 func logColor(logName string) string {
 	settingsKey := fmt.Sprintf("log_color_%s", logName)
-	colorName := settings[settingsKey]
+	colorName := settings[settingsKey].(string)
 
 	return colors[colorName]
-}
-
-func loadEnvSettings() {
-	for key, _ := range settings {
-		envKey := fmt.Sprintf("%s%s", envSettingsPrefix, strings.ToUpper(key))
-		if value := os.Getenv(envKey); value != "" {
-			settings[key] = value
-		}
-	}
 }
 
 func loadRunnerConfigSettings() {
@@ -85,39 +71,30 @@ func loadRunnerConfigSettings() {
 	}
 
 	logger.Printf("Loading settings from %s", configPath())
-	sections, err := config.ParseFile(configPath(), mainSettingsSection)
+	buf, err := ioutil.ReadFile("fresh.json")
 	if err != nil {
 		return
 	}
-
-	for key, value := range sections[mainSettingsSection] {
-		settings[key] = value
+	err = json.Unmarshal(buf, &settings)
+	if err != nil {
+		return
 	}
 }
 
 func initSettings() {
-	loadEnvSettings()
 	loadRunnerConfigSettings()
 }
 
-func getenv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-
-	return defaultValue
-}
-
 func root() string {
-	return settings["root"]
+	return settings["root"].(string)
 }
 
 func tmpPath() string {
-	return settings["tmp_path"]
+	return settings["tmp_path"].(string)
 }
 
 func buildName() string {
-	return settings["build_name"]
+	return settings["build_name"].(string)
 }
 func buildPath() string {
 	p := filepath.Join(tmpPath(), buildName())
@@ -128,7 +105,7 @@ func buildPath() string {
 }
 
 func buildErrorsFileName() string {
-	return settings["build_log"]
+	return settings["build_log"].(string)
 }
 
 func buildErrorsFilePath() string {
@@ -136,11 +113,18 @@ func buildErrorsFilePath() string {
 }
 
 func configPath() string {
-	return settings["config_path"]
+	return settings["config_path"].(string)
 }
 
 func buildDelay() time.Duration {
-	value, _ := strconv.Atoi(settings["build_delay"])
-
-	return time.Duration(value)
+	v := settings["build_delay"]
+	t := reflect.TypeOf(v)
+	switch t.Kind() {
+	case reflect.Float64:
+		return time.Duration(int(v.(float64)))
+	case reflect.Int:
+		return time.Duration(v.(int))
+	default:
+		return time.Duration(1000)
+	}
 }
