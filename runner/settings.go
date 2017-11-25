@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -9,69 +8,38 @@ import (
 
 	"io/ioutil"
 	"encoding/json"
-	"reflect"
 )
 
-var settings = map[string]interface{}{
-	"config_path":       "./fresh.json",
-	"root":              ".",
-	"tmp_path":          "./tmp",
-	"build_name":        "runner-build",
-	"build_log":         "runner-build-errors.log",
-	"valid_ext":         []interface{}{"go", "html", "css", "js"},
-	"no_rebuild_ext":    []interface{}{"json", "conf", "gitignore", "bat"},
-	"ignored":           []interface{}{"tmp"},
-	"build_delay":       600,
-	"colors":            true,
-	"log_color_main":    "cyan",
-	"log_color_build":   "yellow",
-	"log_color_runner":  "green",
-	"log_color_watcher": "magenta",
-	"log_color_app":     "",
-	"pre_exec":          []interface{}{},
-}
-
-var colors = map[string]string{
-	"reset":          "0",
-	"black":          "30",
-	"red":            "31",
-	"green":          "32",
-	"yellow":         "33",
-	"blue":           "34",
-	"magenta":        "35",
-	"cyan":           "36",
-	"white":          "37",
-	"bold_black":     "30;1",
-	"bold_red":       "31;1",
-	"bold_green":     "32;1",
-	"bold_yellow":    "33;1",
-	"bold_blue":      "34;1",
-	"bold_magenta":   "35;1",
-	"bold_cyan":      "36;1",
-	"bold_white":     "37;1",
-	"bright_black":   "30;2",
-	"bright_red":     "31;2",
-	"bright_green":   "32;2",
-	"bright_yellow":  "33;2",
-	"bright_blue":    "34;2",
-	"bright_magenta": "35;2",
-	"bright_cyan":    "36;2",
-	"bright_white":   "37;2",
-}
-
-func logColor(logName string) string {
-	settingsKey := fmt.Sprintf("log_color_%s", logName)
-	colorName := settings[settingsKey].(string)
-
-	return colors[colorName]
+var settings = struct {
+	ConfigPath   string   `json:"config_path"`
+	Root         string   `json:"root"`
+	TmpPath      string   `json:"tmp_path"`
+	BuildName    string   `json:"build_name"`
+	BuildLog     string   `json:"build_log"`
+	ValidExt     []string `json:"valid_ext"`
+	NoRebuildExt []string `json:"no_rebuild_ext"`
+	Ignored      []string `json:"ignored"`
+	BuildDelay   int      `json:"build_delay"`
+	PreExec      []string `json:"pre_exec"`
+}{
+	ConfigPath:   "./fresh.json",
+	Root:         ".",
+	TmpPath:      "./tmp",
+	BuildName:    "runner-build",
+	BuildLog:     "runner-build-errors.log",
+	ValidExt:     []string{"go", "html", "css", "js"},
+	NoRebuildExt: []string{"json", "conf", "gitignore", "bat"},
+	Ignored:      []string{"tmp"},
+	BuildDelay:   600,
+	PreExec:      []string{},
 }
 
 func loadRunnerConfigSettings() {
-	if _, err := os.Stat(configPath()); err != nil {
+	if _, err := os.Stat(settings.ConfigPath); err != nil {
 		return
 	}
 
-	logger.Printf("Loading settings from %s", configPath())
+	logger.Printf("Loading settings from %s", settings.ConfigPath)
 	buf, err := ioutil.ReadFile("fresh.json")
 	if err != nil {
 		return
@@ -86,46 +54,18 @@ func initSettings() {
 	loadRunnerConfigSettings()
 }
 
-func root() string {
-	return settings["root"].(string)
-}
-
-func tmpPath() string {
-	return settings["tmp_path"].(string)
-}
-
-func buildName() string {
-	return settings["build_name"].(string)
-}
 func buildPath() string {
-	p := filepath.Join(tmpPath(), buildName())
+	p := filepath.Join(settings.TmpPath, settings.BuildName)
 	if runtime.GOOS == "windows" && filepath.Ext(p) != ".exe" {
 		p += ".exe"
 	}
 	return p
 }
 
-func buildErrorsFileName() string {
-	return settings["build_log"].(string)
-}
-
 func buildErrorsFilePath() string {
-	return filepath.Join(tmpPath(), buildErrorsFileName())
-}
-
-func configPath() string {
-	return settings["config_path"].(string)
+	return filepath.Join(settings.TmpPath, settings.BuildLog)
 }
 
 func buildDelay() time.Duration {
-	v := settings["build_delay"]
-	t := reflect.TypeOf(v)
-	switch t.Kind() {
-	case reflect.Float64:
-		return time.Duration(int(v.(float64)))
-	case reflect.Int:
-		return time.Duration(v.(int))
-	default:
-		return time.Duration(1000)
-	}
+	return time.Duration(settings.BuildDelay)
 }

@@ -9,10 +9,10 @@ import (
 )
 
 func preExec() {
-	for _, s := range settings["pre_exec"].([]interface{}) {
+	for _, s := range settings.PreExec {
 		buildLog(fmt.Sprintf("Exec: %s", s))
 
-		cmd := exec.Command("cmd", "/C", s.(string))
+		cmd := exec.Command("cmd", "/C", s)
 		cmd.Run()
 	}
 }
@@ -20,7 +20,7 @@ func preExec() {
 func build() (string, bool) {
 	buildLog("Building...")
 
-	cmd := exec.Command("go", "build", "-o", buildPath(), root())
+	cmd := exec.Command("go", "build", "-o", buildPath(), settings.Root)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {

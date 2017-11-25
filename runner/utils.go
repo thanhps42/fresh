@@ -9,7 +9,7 @@ import (
 
 func initFolders() {
 	runnerLog("InitFolders")
-	path := tmpPath()
+	path := settings.TmpPath
 	runnerLog("mkdir %s", path)
 	err := os.Mkdir(path, 0755)
 	if err != nil {
@@ -19,7 +19,7 @@ func initFolders() {
 
 func isTmpDir(path string) bool {
 	absolutePath, _ := filepath.Abs(path)
-	absoluteTmpPath, _ := filepath.Abs(tmpPath())
+	absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
 
 	return absolutePath == absoluteTmpPath
 }
@@ -30,8 +30,8 @@ func isIgnoredFolder(path string) bool {
 		return false
 	}
 
-	for _, value := range settings["ignored"].([]interface{}) {
-		if value.(string) == paths[0] {
+	for _, value := range settings.Ignored {
+		if value == paths[0] {
 			return true
 		}
 	}
@@ -40,7 +40,7 @@ func isIgnoredFolder(path string) bool {
 
 func isWatchedFile(path string) bool {
 	absolutePath, _ := filepath.Abs(path)
-	absoluteTmpPath, _ := filepath.Abs(tmpPath())
+	absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
 
 	if strings.HasPrefix(absolutePath, absoluteTmpPath) {
 		return false
@@ -48,8 +48,8 @@ func isWatchedFile(path string) bool {
 
 	ext := filepath.Ext(path)
 
-	for _, e := range settings["valid_ext"].([]interface{}) {
-		if fmt.Sprintf(".%s", e) == ext {
+	for _, e := range settings.ValidExt {
+		if e == "*" || fmt.Sprintf(".%s", e) == ext {
 			return true
 		}
 	}
@@ -58,8 +58,8 @@ func isWatchedFile(path string) bool {
 }
 
 func shouldRebuild(eventName string) bool {
-	for _, e := range settings["no_rebuild_ext"].([]interface{}) {
-		ext := "." + e.(string)
+	for _, e := range settings.NoRebuildExt {
+		ext := "." + e
 		fileName := strings.Replace(strings.Split(eventName, ":")[0], `"`, "", -1)
 		if strings.HasSuffix(fileName, ext) {
 			return false
