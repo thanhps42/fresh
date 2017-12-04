@@ -30,7 +30,7 @@ var settings = struct {
 	ValidExt:     []string{"go", "html", "css", "js"},
 	NoRebuildExt: []string{"json", "conf", "gitignore", "bat"},
 	Ignored:      []string{"tmp", ".idea", ".vscode"},
-	BuildDelay:   600,
+	BuildDelay:   1500,
 	PreExec:      []string{},
 }
 
