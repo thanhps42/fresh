@@ -20,7 +20,7 @@ func preExec() {
 func build() (string, bool) {
 	buildLog("Building...")
 
-	cmd := exec.Command("go", "build", "-o", buildPath(), settings.WorkingDirectory)
+	cmd := exec.Command("go", "build", "-o", buildPath(), settings.Root)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {

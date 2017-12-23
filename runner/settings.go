@@ -25,7 +25,7 @@ var settings = struct {
 }{
 	ConfigPath:       "./fresh.json",
 	Root:             ".",
-	WorkingDirectory: ".",
+	WorkingDirectory: "",
 	TmpPath:          "./tmp",
 	BuildName:        "runner-build",
 	BuildLog:         "runner-build-errors.log",

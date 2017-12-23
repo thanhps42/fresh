@@ -9,6 +9,9 @@ func run() (bool, *exec.Cmd) {
 	runnerLog("Running...")
 
 	cmd := exec.Command(buildPath())
+	if settings.WorkingDirectory != "" {
+		cmd.Dir = settings.WorkingDirectory
+	}
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
