@@ -18,7 +18,7 @@ func preExec() {
 }
 
 func build() (string, bool) {
-	buildLog("Building...")
+	buildLog("Building... : " + buildPath())
 
 	cmd := exec.Command("go", "build", "-o", buildPath(), settings.Root)
 

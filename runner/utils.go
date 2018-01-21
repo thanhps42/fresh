@@ -9,7 +9,8 @@ import (
 
 func initFolders() {
 	runnerLog("InitFolders")
-	path := settings.TmpPath
+	//path := settings.TmpPath
+	path := settings.WorkingDirectory
 	runnerLog("mkdir %s", path)
 	err := os.Mkdir(path, 0755)
 	if err != nil {
@@ -19,7 +20,8 @@ func initFolders() {
 
 func isTmpDir(path string) bool {
 	absolutePath, _ := filepath.Abs(path)
-	absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
+	//absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
+	absoluteTmpPath, _ := filepath.Abs(settings.WorkingDirectory)
 
 	return absolutePath == absoluteTmpPath
 }
@@ -40,7 +42,8 @@ func isIgnoredFolder(path string) bool {
 
 func isWatchedFile(path string) bool {
 	absolutePath, _ := filepath.Abs(path)
-	absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
+	//absoluteTmpPath, _ := filepath.Abs(settings.TmpPath)
+	absoluteTmpPath, _ := filepath.Abs(settings.WorkingDirectory)
 
 	if strings.HasPrefix(absolutePath, absoluteTmpPath) {
 		return false

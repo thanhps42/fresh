@@ -12,6 +12,7 @@ func run() (bool, *exec.Cmd) {
 	if settings.WorkingDirectory != "" {
 		cmd.Dir = settings.WorkingDirectory
 	}
+	runnerLog("working directory: " + cmd.Dir)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
