@@ -8,7 +8,7 @@ import (
 func run() (bool, *exec.Cmd) {
 	runnerLog("Running...")
 
-	cmd := exec.Command(buildPath())
+	cmd := exec.Command(buildName())
 	if settings.WorkingDirectory != "" {
 		cmd.Dir = settings.WorkingDirectory
 	}

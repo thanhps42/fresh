@@ -8,6 +8,7 @@ import (
 
 	"io/ioutil"
 	"encoding/json"
+	"fmt"
 )
 
 var settings = struct {
@@ -63,6 +64,18 @@ func buildPath() string {
 		p += ".exe"
 	}
 	return p
+}
+
+func buildName() string {
+	var ext string
+	switch runtime.GOOS {
+	case "windows":
+		ext = "exe"
+	default:
+		return ""
+	}
+
+	return fmt.Sprintf("./%s.%s", settings.BuildName, ext)
 }
 
 func buildErrorsFilePath() string {
